@@ -1,42 +1,42 @@
 import { useState } from "react";
 import { Users, Plus, Pencil, Trash2 } from "lucide-react";
+import { useEffect } from "react";
+import {getUsers, createUser, updateUser, deleteUser} from "../../services/userService";
 
 const UsersPage = () => {
-  const [users, setUsers] = useState([
-    { id: 1, name: "Tanvir Ahmed", email: "tanvir@gmail.com" },
-    { id: 2, name: "John Doe", email: "john@gmail.com" },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [form, setForm] = useState({ name: "", email: "" });
   const [editingId, setEditingId] = useState(null);
 
-  // ADD / UPDATE
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const users = await getUsers();
+      console.log(users);
+      setUsers(users.data.users.data);
+    };
+    fetchUsers();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (editingId) {
-      setUsers(users.map(u =>
-        u.id === editingId ? { ...u, ...form } : u
-      ));
-      setEditingId(null);
-    } else {
-      setUsers([
-        ...users,
-        { id: Date.now(), ...form }
-      ]);
+      await updateUser(editingId, form);
+      setUsers(users.map(u => u.id === editingId ? { ...u, ...form } : u));
+    }else {
+      const newUser = await createUser(form);
+      setUsers([...users, newUser.data.user]);
     }
-
     setForm({ name: "", email: "" });
+    setEditingId(null);
   };
 
-  // EDIT
   const handleEdit = (user) => {
     setForm({ name: user.name, email: user.email });
     setEditingId(user.id);
   };
 
-  // DELETE
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
+    await deleteUser(id);
     setUsers(users.filter(u => u.id !== id));
   };
 
@@ -79,7 +79,7 @@ const UsersPage = () => {
         <thead className="bg-black-100">
           <tr>
             <th className="p-2 border">#</th>
-            <th className="p-2 border">Name</th>
+            <th className="p-2 border">Name </th>
             <th className="p-2 border">Email</th>
             <th className="p-2 border">Actions</th>
           </tr>
