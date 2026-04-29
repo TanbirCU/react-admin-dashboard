@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Users, Plus, Pencil, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { ArrowUpDown } from "lucide-react";
+import { toast } from "react-hot-toast";
 import {getUsers, createUser, updateUser, deleteUser} from "../../services/userService";
 
 const UsersPage = () => {
@@ -35,17 +36,24 @@ const UsersPage = () => {
 
   const handleSubmit = async(e)=>{
     e.preventDefault();
+    const loadingToast = toast.loading("Processing...");
     try{
       if(editingId){
+        // update User
+        const response = await updateUser(editingId, form);
+        setUsers((prevUsers)=>prevUsers.map(u=>u.id === editingId ? response.data : u));
+        setEditingId(null);
+        toast.success(response.data.message, {
+          id: loadingToast,
+        });
+
 
       }else{
         // create User
         const response = await createUser(form);
-        setUsers((prevUsers)=>[
-          ...prevUsers,
-          response.data,
-
-        ]);
+        toast.success(response.data.message, {
+          id: loadingToast,
+        });
 
       }
       setForm({
@@ -63,15 +71,27 @@ const UsersPage = () => {
     setUsers(users.data.users.data);
   };
 
-  // const handleEdit = (user) => {
-  //   setForm({ name: user.name, email: user.email });
-  //   setEditingId(user.id);
-  // };
+  const handleEdit = (user) => {
+    setForm({ name: user.name, email: user.email });
+    setEditingId(user.id);
+  };
 
-  // const handleDelete = async (id) => {
-  //   await deleteUser(id);
-  //   setUsers(users.filter(u => u.id !== id));
-  // };
+  const handleDelete = async (id) => {
+    const loadingToast = toast.loading("Processing...");
+    try {
+      const response = await deleteUser(id);
+      setUsers(users.filter(u => u.id !== id));
+      toast.success(response.data.message, {
+          id: loadingToast,
+        });
+      fetchUsers();
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      toast.error("Error deleting user", {
+        id: loadingToast,
+      });
+    }
+  };
 
   return (
     <div className="p-6 bg-surface rounded-lg shadow-md">
