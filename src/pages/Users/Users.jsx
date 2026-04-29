@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Users, Plus, Pencil, Trash2 } from "lucide-react";
 import { useEffect } from "react";
+import { ArrowUpDown } from "lucide-react";
 import {getUsers, createUser, updateUser, deleteUser} from "../../services/userService";
 
 const UsersPage = () => {
@@ -8,37 +9,69 @@ const UsersPage = () => {
   const [form, setForm] = useState({ name: "", email: "" });
   const [editingId, setEditingId] = useState(null);
 
+  const[sortField, setSortField] = useState("");
+  const[sortOrder, setSortOrder] = useState("asc");
+
   useEffect(() => {
     const fetchUsers = async () => {
       const users = await getUsers();
-      console.log(users);
       setUsers(users.data.users.data);
     };
     fetchUsers();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleSort = (field) => {
+    
+    const order = sortField === field && sortOrder === "asc" ? "desc" : "asc";
+    setSortField(field);
+    setSortOrder(order);
+    const sorted = [...users].sort((a, b) => {
+      if (a[field] < b[field]) return order === "asc" ? -1 : 1;
+      if (a[field] > b[field]) return order === "asc" ? 1 : -1;
+      return 0;
+    });
+    setUsers(sorted);
+  };
+
+  const handleSubmit = async(e)=>{
     e.preventDefault();
-    if (editingId) {
-      await updateUser(editingId, form);
-      setUsers(users.map(u => u.id === editingId ? { ...u, ...form } : u));
-    }else {
-      const newUser = await createUser(form);
-      setUsers([...users, newUser.data.user]);
+    try{
+      if(editingId){
+
+      }else{
+        // create User
+        const response = await createUser(form);
+        setUsers((prevUsers)=>[
+          ...prevUsers,
+          response.data,
+
+        ]);
+
+      }
+      setForm({
+        name: "",
+        email: "",
+      });
+      await fetchUsers();
+
+    }catch(error){
+      console.error("form can not submit",error);
     }
-    setForm({ name: "", email: "" });
-    setEditingId(null);
+  }
+  const fetchUsers = async () => {
+    const users = await getUsers();
+    setUsers(users.data.users.data);
   };
 
-  const handleEdit = (user) => {
-    setForm({ name: user.name, email: user.email });
-    setEditingId(user.id);
-  };
+  // const handleEdit = (user) => {
+  //   setForm({ name: user.name, email: user.email });
+  //   setEditingId(user.id);
+  // };
 
-  const handleDelete = async (id) => {
-    await deleteUser(id);
-    setUsers(users.filter(u => u.id !== id));
-  };
+  // const handleDelete = async (id) => {
+  //   await deleteUser(id);
+  //   setUsers(users.filter(u => u.id !== id));
+  // };
 
   return (
     <div className="p-6 bg-surface rounded-lg shadow-md">
@@ -50,7 +83,7 @@ const UsersPage = () => {
       </div>
 
       {/* FORM */}
-      <form onSubmit={handleSubmit} className="mb-6 flex gap-3">
+       <form onSubmit={handleSubmit} className="mb-6 flex gap-3">
         <input
           type="text"
           placeholder="Name"
@@ -78,9 +111,33 @@ const UsersPage = () => {
       <table className="w-full border">
         <thead className="bg-black-100">
           <tr>
-            <th className="p-2 border">#</th>
-            <th className="p-2 border">Name </th>
-            <th className="p-2 border">Email</th>
+            <th
+                onClick={()=>handleSort("id")}
+                className="p-2 border cursor-pointer"
+              >
+              <div className="flex items-center justify-center gap-1">
+                ID
+                <ArrowUpDown size={16} />
+              </div>
+            </th>
+            <th  
+                onClick={()=>handleSort("name")}
+                className="p-2 border cursor-pointer"
+              >
+              <div className="flex items-center justify-center gap-1">
+                Name
+                <ArrowUpDown size={16} />
+              </div>
+            </th>
+            <th  
+            onClick={()=>handleSort("email")}
+                className="p-2 border cursor-pointer"
+              >
+              <div className="flex items-center justify-center gap-1">
+                Email
+                <ArrowUpDown size={16} />
+              </div>
+            </th>
             <th className="p-2 border">Actions</th>
           </tr>
         </thead>
@@ -88,7 +145,7 @@ const UsersPage = () => {
         <tbody>
           {users.map((user, index) => (
             <tr key={user.id}>
-              <td className="p-2 border">{index + 1}</td>
+              <td className="p-2 border flex justify-center">{index + 1}</td>
               <td className="p-2 border">{user.name}</td>
               <td className="p-2 border">{user.email}</td>
               <td className="p-2 border flex gap-2 justify-center">
