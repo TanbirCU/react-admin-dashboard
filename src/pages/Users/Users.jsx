@@ -121,7 +121,7 @@ const UsersPage = () => {
           required
         />
 
-        <button className="bg-blue-600 text-white px-4 rounded flex items-center gap-1">
+        <button className="bg-blue-600 text-white px-4 rounded flex items-center gap-1 cursor-pointer hover:bg-blue-700" type="submit">
           <Plus size={16} />
           {editingId ? "Update" : "Add"}
         </button>
@@ -173,7 +173,7 @@ const UsersPage = () => {
                 {/* EDIT */}
                 <button
                   onClick={() => handleEdit(user)}
-                  className="text-blue-600"
+                  className="text-blue-600 cursor-pointer"
                 >
                   <Pencil size={18} />
                 </button>
@@ -181,7 +181,7 @@ const UsersPage = () => {
                 {/* DELETE */}
                 <button
                   onClick={() => handleDelete(user.id)}
-                  className="text-red-600"
+                  className="text-red-600 cursor-pointer"
                 >
                   <Trash2 size={18} />
                 </button>
