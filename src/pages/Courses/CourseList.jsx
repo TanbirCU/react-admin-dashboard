@@ -3,9 +3,11 @@ import { Users, Plus, Pencil, Trash2 } from "lucide-react";
 import { useEffect } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 
 const CourseList = () => {
+    const navigate = useNavigate();
     return (
        <div className="p-6 bg-surface rounded-lg shadow-md">
       
@@ -15,7 +17,7 @@ const CourseList = () => {
             <h2 className="text-xl font-bold">Course Management</h2>
         </div>
         <div className="flex justify-end mb-4">
-            <button className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+            <button className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600" onClick={() => navigate("/courses/create")} >
                 <Plus size={16} />
                 Add Course
             </button>

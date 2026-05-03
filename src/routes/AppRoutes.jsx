@@ -3,6 +3,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Users from "../pages/Users/Users";
 import Courses from "../pages/Courses/CourseList";
+import CreateCourse from "../pages/Courses/CreateCourse";
 
 const AppRoutes = () => {
     return (
@@ -12,6 +13,8 @@ const AppRoutes = () => {
                     <Route index element={<Dashboard />} />
                     <Route path="users" element={<Users />} />
                     <Route path="courses" element={<Courses />} />
+                    <Route path="courses/create" element={<CreateCourse />} />
+
                 </Route>
             </Routes>
         </BrowserRouter>
