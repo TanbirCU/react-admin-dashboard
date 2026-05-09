@@ -1,6 +1,7 @@
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const CourseForm = () => {
+    const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -237,6 +238,7 @@ const CourseForm = () => {
           <button
             type="button"
             className="px-6 py-3 rounded-xl border border-white/10 text-text-muted hover:bg-white/5 transition-colors"
+           onClick={navigate(-1)}
           >
             Cancel
           </button>
